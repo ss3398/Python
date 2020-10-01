@@ -1,0 +1,88 @@
+P 
+1. What are the names of the local variables defined at line 16? (hint: use dir())
+
+['bmbc', 'offsets', 'pattern', 'pattern_length', 'text', 'text_length']
+
+2. What is the value of the variable pattern_length at line 16?
+
+5
+
+3. What is the value of the variable search_index the first time line 23 is executed?
+
+4
+
+4. What is the value of the variable text_index the second time line 23 is executed?
+
+9
+
+5. What is the value and type of the variable offests at line 29 when the variable text_index has the value 377?
+
+[304, 378]
+
+------------------------------------------------------------------
+
+python3 -m pdb debugging.py 
+> /Users/polly/Downloads/t/Python/Polly/a6/debugging.py(1)<module>()
+-> def search(text, pattern):
+(Pdb) b 16
+Breakpoint 1 at /Users/polly/Downloads/t/Python/Polly/a6/debugging.py:16
+(Pdb) c
+> /Users/polly/Downloads/t/Python/Polly/a6/debugging.py(16)search()
+-> bmbc = [pattern_length] * 256
+(Pdb) dir()
+['offsets', 'pattern', 'pattern_length', 'text', 'text_length']
+(Pdb) n
+> /Users/polly/Downloads/t/Python/Polly/a6/debugging.py(17)search()
+-> for index, char in enumerate(pattern[:-1]):
+(Pdb) dir()
+['bmbc', 'offsets', 'pattern', 'pattern_length', 'text', 'text_length']
+(Pdb) p pattern_length
+5
+(Pdb) b 23
+Breakpoint 2 at /Users/polly/Downloads/t/Python/Polly/a6/debugging.py:23
+(Pdb) c
+> /Users/polly/Downloads/t/Python/Polly/a6/debugging.py(23)search()
+-> text_index = search_index
+(Pdb) n
+> /Users/polly/Downloads/t/Python/Polly/a6/debugging.py(24)search()
+-> while text_index >= 0 and \
+(Pdb) p search_index
+4
+(Pdb) c
+> /Users/polly/Downloads/t/Python/Polly/a6/debugging.py(23)search()
+-> text_index = search_index
+(Pdb) n
+> /Users/polly/Downloads/t/Python/Polly/a6/debugging.py(24)search()
+-> while text_index >= 0 and \
+(Pdb) p search_index
+9
+(Pdb) p text_index
+9
+(Pdb) clear
+Clear all breaks? yes
+Deleted breakpoint 1 at /Users/polly/Downloads/t/Python/Polly/a6/debugging.py:16
+Deleted breakpoint 2 at /Users/polly/Downloads/t/Python/Polly/a6/debugging.py:23
+(Pdb) break 29, text_index=377
+Breakpoint 3 at /Users/polly/Downloads/t/Python/Polly/a6/debugging.py:29
+(Pdb) c
+> /Users/polly/Downloads/t/Python/Polly/a6/debugging.py(29)search()
+-> offsets.append(text_index + 1)
+(Pdb) p text_index
+303
+(Pdb) c
+> /Users/polly/Downloads/t/Python/Polly/a6/debugging.py(29)search()
+-> offsets.append(text_index + 1)
+(Pdb) p text_index
+377
+(Pdb) p offests
+*** NameError: name 'offests' is not defined
+(Pdb) n
+> /Users/polly/Downloads/t/Python/Polly/a6/debugging.py(30)search()
+-> search_index += bmbc[ord(text[search_index])]
+(Pdb) p offests
+*** NameError: name 'offests' is not defined
+(Pdb) p offsets
+[304, 378]
+(Pdb) p text_index
+377
+(Pdb) 

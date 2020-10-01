@@ -1,0 +1,59 @@
+select nt, round((min(distance_traveled) + ((max(distance_traveled)-min(distance_traveled))/2) ),2) dist_mid_point , sum(total_enc_cnt) total_enc_cnt from (
+select distance_traveled, total_enc_cnt, ntile(100) over (order by distance_traveled) nt
+from (
+select distance_traveled,sum(total_enc_cnt) total_enc_cnt 
+from BHPATSITEDATAAGGWITHDIST group by distance_traveled)    
+)
+group by nt
+order by 2
+
+select nt, min(distance_traveled) + (max(distance_traveled)-min(distance_traveled))/2 dist_mid_point, sum(total_enc_cnt) total_enc_cnt from (
+select distance_traveled, total_enc_cnt, ntile(100) over (order by distance_traveled) nt
+from (
+select distance_traveled,sum(total_enc_cnt) total_enc_cnt 
+from BHPATSITEDATAAGGWITHDIST group by distance_traveled)    
+)
+group by nt
+order by 2;
+
+
+52 minutes ago	select zip pat_zip, site_zip,sum(enc_cnt) from patdata3 group by zip,site_zip	SSORCL
+52 minutes ago	select zip pat_zip, site_zip,sum(enc_cnt) from patdata3 group by zip pat_zip	SSORCL
+53 minutes ago	create table patdata3 as select t1.PAT_ID,t1.PAT_MRN_ID,t1.CITY,t1.STATE,(case when instr(t1.zip,'-'	SSORCL
+74 minutes ago	select t1.PAT_ID,t1.PAT_MRN_ID,t1.CITY,t1.STATE,(case when instr(t1.zip,'-') = 0 then t1.zip else su	SSORCL
+74 minutes ago	select count(1) from sitezips	SSORCL
+75 minutes ago	insert into sitezips (site_loc,site_zip) values ('DEDAH','02026');	SSORCL
+75 minutes ago	insert into sitezips (site_loc,site_zip) values ('NWDAH','02062');	SSORCL
+75 minutes ago	insert into sitezips (site_loc,site_zip) values ('CND','01742');	SSORCL
+75 minutes ago	insert into sitezips (site_loc,site_zip) values ('CND','01742'); insert into sitezips (site_loc,site	SSORCL
+76 minutes ago	insert into sitezips (site_loc,site_zip) values ('BTA','02184')	SSORCL
+76 minutes ago	select * from sitezips	SSORCL
+78 minutes ago	select t1.PAT_ID,t1.PAT_MRN_ID,t1.CITY,t1.STATE,(case when instr(t1.zip,'-') = 0 then t1.zip else su	SSORCL
+79 minutes ago	select t1.PAT_ID,t1.PAT_MRN_ID,t1.CITY,t1.STATE,instr(t1.zip,'-') c1, substr(t1.ZIP,1,instr(t1.zip,'	SSORCL
+80 minutes ago	select t1.PAT_ID,t1.PAT_MRN_ID,t1.CITY,t1.STATE,substr(t1.ZIP,1,instr(t1.zip,'-')) zip, t1.REV_LOC_I	SSORCL
+80 minutes ago	select t1.PAT_ID,t1.PAT_MRN_ID,t1.CITY,t1.STATE,substr(t1.ZIP,1,instr(t1.zip,'-')) zip t1.REV_LOC_ID	SSORCL
+81 minutes ago	select * from sitezips	SSORCL
+82 minutes ago	select t1.PAT_ID,t1.PAT_MRN_ID,t1.CITY,t1.STATE,t1.ZIP,t1.REV_LOC_ID,t1.LOCATION_ABBR,t1.LOC_NAME,t1	SSORCL
+83 minutes ago	select * from sitezips	SSORCL
+88 minutes ago	select t1.PAT_ID,t1.PAT_MRN_ID,t1.CITY,t1.STATE,t1.ZIP,t1.REV_LOC_ID,t1.LOCATION_ABBR,t1.LOC_NAME,t1	SSORCL
+89 minutes ago	select t1.PAT_ID,t1.PAT_MRN_ID,t1.CITY,t1.STATE,t1.ZIP,t1.REV_LOC_ID,t1.LOCATION_ABBR,t1.LOC_NAME,t1	SSORCL
+103 minutes ago	select LOCATION_ABBR,count(1) from patdata where LOCATION_ABBR not in (select SITE_LOC from sitezips	SSORCL
+104 minutes ago	select * from patdata where LOCATION_ABBR not in (select SITE_LOC from sitezips)	SSORCL
+104 minutes ago	select * from patdata where LOCATION_ABBR is null	SSORCL
+105 minutes ago	select * from (select t1.LOCATION_ABBR,count(1) cnt from patdata t1 full outer join sitezips t2 on (	SSORCL
+106 minutes ago	select t1.LOCATION_ABBR,count(1) from patdata t1 full outer join sitezips t2 on (t1.LOCATION_ABBR =	SSORCL
+106 minutes ago	select count(t1.pat_id) from patdata t1 join sitezips t2 on (t1.LOCATION_ABBR = t2.SITE_LOC)	SSORCL
+107 minutes ago	select count(t1.patid) from patdata t1 join sitezips t2 on (t1.LOCATION_ABBR = t2.SITE_LOC)	SSORCL
+107 minutes ago	select count(t1.patid) from patdata t1 join siteszip t2 on (t1.LOCATION_ABBR = t2.SITE_LOC)	SSORCL
+108 minutes ago	select count(*) from patdata	SSORCL
+113 minutes ago	commit;	SSORCL
+113 minutes ago	select count(*) from patdata	SSORCL
+113 minutes ago	insert into patdata(PAT_ID,PAT_MRN_ID,CITY,STATE,ZIP,REV_LOC_ID,LOCATION_ABBR,LOC_NAME,ENC_CNT) sel	SSORCL
+114 minutes ago	select * from patdata where rownum < 11	SSORCL
+114 minutes ago	select * from patdata2 where rownum < 11	SSORCL
+115 minutes ago	select * from patdata where rownum < 11	SSORCL
+2 hours ago	select * from patdata	SSORCL
+2 hours ago	select count(*) from patdata	SSORCL
+2 hours ago	select count(*) from sitezips	SSORCL
+2 hours ago	alter table "SITEZIPS" add constraint "SITEZIPS_CON" unique ("SITE_LOC") /
+

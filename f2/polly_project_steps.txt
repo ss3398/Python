@@ -1,0 +1,107 @@
+Project steps....
+
+# The patient data is in an Excel filed called "Copy of BH Pts Zip by Site.xlsx" in the sheet called "Data"
+
+# Go to apex.oracle.com (free account). Upload the patient data using the Excel file into a table called pat data.
+
+# A few records were rejected because MRN_ID and PAT_ID was not a number. Such rejected rows were manually fixed on Excel and loaded into a temporary table called patdata2.
+Then these records were loaded to the main table patdata using this:
+Insert into patdata select * from patdata2;
+
+# Site zips are in a file called "BH Site Location Zip.xlsx"
+
+# On apex, load this into a table called sitezips.
+
+# We want to ensure that the sitezips table has all the site zip codes that are present in the site abbr code in patdata table.
+This is done by running this query:
+
+Select * from patdata t1 where not exists (select 1 from sitezips t2 where t1.LOCATION_ABBR = t2.site_loc)
+
+In my case, some missing zip codes were found. This was fixed by running these statements:
+insert into sitezips (site_loc,site_zip) values ('DEDAH','02026');	
+insert into sitezips (site_loc,site_zip) values ('NWDAH','02062');
+insert into sitezips (site_loc,site_zip) values ('CND','01742');
+insert into sitezips (site_loc,site_zip) values ('BTA','02184');
+
+# After this, we are ready to create a single file that would contain both the patient zip code and the site zip code. This is done by running this query:
+
+select t1.*, t2.region site_region, t2.site_zip
+from patdata t1 join sitezips t2 on (t1.LOCATION_ABBR = t2.site_loc);
+
+The output of this query is saved into a CSV file called BHPatSiteData.csv.
+
+# Open the CSV file in Excel. Two of the site zips had an extra character appended for an unknown reason. This had to be cleaned up. 
+Do a Find and Replace All occurences of 02215†  with 02215 
+And 02155† with 02155
+After this data cleaning, load this cleaned data to table patdata2 at Apex.
+
+# Some patient zip codes were in 5+4 digit format and some were in 5 digit format. To standardize this into 5 digit format, this Oracle expression was used:
+(case when instr(t1.zip,'-') = 0 then t1.zip else substr(t1.zip,1,instr(t1.zip,'-')-1) end)
+
+as shown in the next step.
+
+# We aggregate data such that we have one row for each combination of patient zip code and site zip code. We do it by running this query:
+
+Select (case when instr(t1.zip,'-') = 0 then t1.zip else substr(t1.zip,1,instr(t1.zip,'-')-1) end) patient_zip, site_zip, sum(enc_cnt) total_enc_cnt
+From patdata2 t1
+Group by (case when instr(t1.zip,'-') = 0 then t1.zip else substr(t1.zip,1,instr(t1.zip,'-')-1) end), site_zip;
+
+We save this to a CSV file called BHPatSiteDataAgg.csv
+
+# We run proj1.py python code. It reads BHPatSiteDataAgg.csv and adds a column to store the distance between patient zip code and site zip code and saves into a new file called BHPatSiteDataAggWithDist.csv.
+
+# In spite of the aggregation, we still have 2500+ records. We can group them into buckets to make this more manageable. So we load the file BHPatSiteDataAggWithDist.csv into a table on Apex called BHPATSITEDATAAGGWITHDIST, and then run this query to further summarize into 100 records. 
+
+select nt, round((min(distance_traveled) + ((max(distance_traveled)-min(distance_traveled))/2) ),2) dist_mid_point , sum(total_enc_cnt) total_enc_cnt from (
+select distance_traveled, total_enc_cnt, ntile(100) over (order by distance_traveled) nt
+from (
+select distance_traveled,sum(total_enc_cnt) total_enc_cnt 
+from BHPATSITEDATAAGGWITHDIST group by distance_traveled)    
+)
+group by nt
+order by 2;
+
+Output of this query is saved into a CSV file called hundred_ntile.csv.
+
+# Next, the proj2.py python program reads the above file and creates scatter plots. The first plot shows Distance vs # of encounters. The second shows the same in a log log plot.
+
+# Next, the proj3.py python program reads the same csv file and creates a linear regression model and shows both the original data and the model regression line on a chart.
+
+
+That's it!
+
+
+Summary of the data issues found and fixed:
+-------------------------------------------
+
+Data issues found:
+1. Missing zip codes in the site file (patient went to a site, that was not there in the site zip code file)
+2. Two of the site zip codes had a strange symbol at the end of the zip code.
+3. MRN_ID and PAT_ID should be numbers, but there were 8 records where it had texts.
+4. Patient zip code was 5+4 digit format for some records, and 5 digit format in others.
+5. Too many distance data points (>2500). Hard to see on scatter plot graphs.
+
+How did I resolve it?
+1. We added the missing site zip codes by looking up Google maps.
+2. Manually cleaned it on Excel using find and replace.
+3. Manually cleaned and reloaded these records.
+4. Use SQL functions INSTR and SUBSTR to convert all patient zip codes to 5 digit format.
+5. Aggregated data into 100 buckets. At the end of this step, we only 100 data points. Easier to see on a scatter plot. 
+
+List of files:
+--------------
+
+# polly_project_steps.txt - this file containing the steps for the project
+# BHPatSiteData.csv - intermediate csv file described above
+# BHPatSiteDataAgg.csv - intermediate csv file described above
+# BHPatSiteDataAggWithDist.csv - intermediate csv file described above
+# hundred_ntile.csv - final csv file
+# proj1.py - calculates distances between zip codes and saves into BHPatSiteDataAggWithDist.csv file
+# proj2.py - creates scatter plots, first normal and then log log
+# proj3.py - creates a linear regression model and shows original data and regression line on a plot
+# total_visits_vs_distance.png - normal scatter plot of distance vs # of interactions
+# total_visits_vs_distance_log_log.png - same data as above, shown on a log - log plot
+# model_total_visits_vs_distance.png - original log-log plot and regression line overlaid 
+
+
+
