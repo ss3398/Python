@@ -1,0 +1,1 @@
+These are Pyhton code for reading movies data from a Mongodb and then do a k-means clustering
